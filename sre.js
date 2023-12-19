@@ -1,3 +1,7 @@
+/* 
+  This check both 443 & 8443 to see if a site is down. Then it blows up someone's inbox if down. 
+*/
+
 const axios = require('axios');
 const fs = require('fs');
 const cheerio = require('cheerio');
@@ -8,6 +12,7 @@ const axiosInstance = axios.create({
   timeout: 108000 // 108 seconds in milliseconds
 });
 
+// Load inventory
 async function fetchActiveData() {
   const response = await axiosInstance.post('https://inventory.alertustech.com/json.php', {
     auth: 'beef'
@@ -19,11 +24,13 @@ async function fetchActiveData() {
   return response.data;
 }
 
+// Load inactive
 function readInactiveData() {
   const data = fs.readFileSync('/home/opc/SRE/inactive.json', 'utf8');
   return JSON.parse(data);
 }
 
+// Look for our Title Text
 async function checkTitle(fqdn) {
   const urls = [
     `https://${fqdn}:443/AlertusWeb/Login?local`,
@@ -45,9 +52,9 @@ async function checkTitle(fqdn) {
   }
 }
 
+// Send that jawns
 function sendEmail(url, error_message) {
     let transporter = nodemailer.createTransport({
-        // SMTP transport configuration
         service: 'gmail',
         auth: {
             user: 'wyhycu@gmail.com',

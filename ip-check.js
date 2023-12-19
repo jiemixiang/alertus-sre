@@ -1,8 +1,12 @@
+/* 
+    This script is neeed because some customers put thier MANAGED SERVER behind CloudFlare and do not tell us. 
+*/
+
 const https = require('https');
 const dns = require('dns').promises;
 const fs = require('fs').promises;
 
-// Function to make a POST request and get inventory
+// Load inventory for variable
 function getInventory() {
     return new Promise((resolve, reject) => {
         const options = {
@@ -35,7 +39,7 @@ function getInventory() {
     });
 }
 
-// Function to load exceptions from inactive.json
+// Load inactive from inactive.json
 async function loadExceptions() {
     try {
         const data = await fs.readFile('inactive.json', 'utf8');
@@ -46,7 +50,7 @@ async function loadExceptions() {
     }
 }
 
-// Function to check IP discrepancies
+// check IP discrepancies
 async function checkIPDiscrepancies() {
     try {
         const inventory = await getInventory();
@@ -71,4 +75,3 @@ async function checkIPDiscrepancies() {
 }
 
 checkIPDiscrepancies();
-

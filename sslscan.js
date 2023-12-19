@@ -1,8 +1,13 @@
+/* 
+    This checks if Let's Encrypt will expire in 30 days or not over both 443 & 8443
+*/
+
 const axios = require('axios');
 const https = require('https');
 const nodemailer = require('nodemailer');
 const fs = require('fs').promises;
 
+// Load inactive
 async function loadExceptions() {
     try {
         const data = await fs.readFile('/home/opc/SRE/inactive.json', 'utf8');
@@ -13,6 +18,7 @@ async function loadExceptions() {
     }
 }
 
+// Load inventory
 async function postRequestAndGetFqdns() {
     try {
         const response = await axios.post('https://inventory.alertustech.com/json.php', {
@@ -27,6 +33,7 @@ async function postRequestAndGetFqdns() {
     }
 }
 
+// Check that jawns
 async function checkSSLExpiryAndNotify(fqdn, exceptions) {
     if (exceptions.includes(fqdn)) {
         console.log(`Skipping SSL check for ${fqdn} (in exceptions list).`);
@@ -63,9 +70,9 @@ async function checkSSLExpiryAndNotify(fqdn, exceptions) {
     }
 }
 
+// Send that jawns
 function sendEmail(url, daysUntilExpiry) {
     let transporter = nodemailer.createTransport({
-        // SMTP transport configuration
         service: 'gmail',
         auth: {
             user: 'wyhycu@gmail.com',
